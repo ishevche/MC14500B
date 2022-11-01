@@ -1,6 +1,6 @@
 module RAM 
 		#(parameter WORD = 1, 
-		  parameter SIZE_LOG = 12,
+		  parameter SIZE_LOG = 8,
 		  parameter SIZE = 2 ** SIZE_LOG)
 		(input logic 						clk,
 		 input logic 						read,
@@ -10,7 +10,7 @@ module RAM
 		 output logic [WORD-1:0]		data_out
 		);
 	
-	logic [WORD-1:0] ram [SIZE-1:0];
+	logic [WORD-1:0] ram [0:SIZE-1];
 	
 	always @(posedge clk) begin
 		if (write)
