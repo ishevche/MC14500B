@@ -1,5 +1,5 @@
 module ROM
-		#(parameter WORD = 8, 
+		#(parameter WORD = 16, 
 		  parameter SIZE_LOG = 12,
 		  parameter SIZE = 2 ** SIZE_LOG)
 		(input logic 						clk,

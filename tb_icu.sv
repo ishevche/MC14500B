@@ -1,7 +1,6 @@
-`include "processor.sv"
 `timescale 1ns / 1ns
 
-module MC14500B_test ();
+module IC_test ();
   logic clk = 0;
   logic data_in;
   logic rst;
@@ -13,7 +12,7 @@ module MC14500B_test ();
   logic flag_f;
   logic rr_out;
   instruction_t i;
-  MC14500B cpu(clk, data_in, rst, i, write, data_out, jmp, rtn, flag_o, flag_f, rr_out);
+  ICU cpu(clk, data_in, rst, i, write, data_out, jmp, rtn, flag_o, flag_f, rr_out);
   
   always begin
     #(50) clk = ~clk;
