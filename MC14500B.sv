@@ -9,22 +9,23 @@ module MC14500B
 		 input logic [WORD-1:0]	program_cmd, 
 		 output instruction_t	opcode);
 	
-	wire [ADDR-1:0] 			counter;
-	wire [WORD-1:0]		 	cmd;
-	wire [ADDR-1:0] 			address;
-	wire 							JMP_FLAG;
-	wire			 				RTN_FLAG;
-	wire 							FLAG_O;
-	wire			 				FLAG_F;
-	wire 							data_out;
-	wire 							data_write;
-	wire							rr_out;
-	wire	 						data_in;
-	wire	 						data_from_ram;
+	logic [ADDR-1:0] 			counter;
+	logic [WORD-1:0]		 	cmd;
+	logic [ADDR-1:0] 			address;
+	logic [ADDR-1:0] 			address_copy;
+	logic 						JMP_FLAG;
+	logic			 				RTN_FLAG;
+	logic 						FLAG_O;
+	logic			 				FLAG_F;
+	logic 						data_out;
+	logic 						data_write;
+	logic							rr_out;
+	logic	 						data_in;
+	logic	 						data_from_ram;
 	
 	always_comb opcode <= instruction_t'(cmd[WORD-1:ADDR]);
-	assign data_in = address == '1 ? rr_out : data_from_ram;
-	assign address = cmd[ADDR-1:0];
+	always_comb data_in = address_copy == '1 ? rr_out : data_from_ram;
+	always_comb address = cmd[ADDR-1:0];
 	
 	RAM #(.SIZE_LOG(ADDR)) 					ram 	(!clk, 
 															!data_write, 
@@ -54,5 +55,8 @@ module MC14500B
 															FLAG_O, 
 															FLAG_F, 
 															rr_out);
+															
+	always @(negedge clk)
+		address_copy <= address;
 	
 endmodule
