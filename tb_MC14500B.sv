@@ -47,5 +47,4 @@ module MC14500B_tests();
 		rst = '0;
 		program_write = '0;
 	end
-	
 endmodule

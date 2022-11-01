@@ -6,3 +6,5 @@ output_files
 MC14500B_*
 c5_pin_model_dump.txt
 *.bak
+*build*
+.*

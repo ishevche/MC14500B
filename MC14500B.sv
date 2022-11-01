@@ -56,4 +56,3 @@ module MC14500B
 															rr_out);
 	
 endmodule
-	
