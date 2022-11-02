@@ -33,13 +33,12 @@ module MC14500B
 															address, 
 															data_out, 
 															data_from_ram);
-	RAM #(.WORD(WORD), .SIZE_LOG(ADDR))	rom 	(clk, 
-															!program_write, 
-															program_write, 
+	ROM #(.WORD(WORD), .SIZE_LOG(ADDR))	rom 	(!program_write,
+															program_write,
 															counter, 
 															program_cmd, 
 															cmd);
-	ProgramCounter #(.SIZE_LOG(ADDR))	cnt	(clk, 
+	ProgramCounter #(.SIZE_LOG(ADDR))	cnt	(!clk, 
 															rst,
 															JMP_FLAG, 
 															address, 

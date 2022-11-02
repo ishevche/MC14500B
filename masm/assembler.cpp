@@ -44,7 +44,7 @@ std::string Assembler::assemble(const std::string &text) {
 
     std::ostringstream ss;
     for (auto [instruction, address] : machine_code)
-        ss << std::hex << instruction << " " << std::setw(2) << std::setfill('0') << address << std::endl;
+        ss << std::hex << instruction << std::setw(2) << std::setfill('0') << address << std::endl;
     return ss.str();
 }
 
