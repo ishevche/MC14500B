@@ -163,6 +163,7 @@ std::vector<std::pair<size_t, size_t>> Assembler::Program::assemble() {
         while (used_addresses.find(idx) != used_addresses.end())
             idx++;
         variable_mapping[variable] = idx;
+        used_addresses.insert(idx);
     }
 
     for (const auto& instructionTuple : instructions) {

@@ -1,34 +1,10 @@
-# SIMPLE program for our MC14500B
-
-PINOUT  INPUT   SENSOR0 0
-        INPUT   SENSOR1 1
-        OUTPUT  LIGHT0  2
-        OUTPUT  LIGHT1  3
-
-# CURRENT_LIGHT=0 & SENSOR0=0 & SENSOR1=1 -> CURRENT_LIGHT=1
-# CURRENT_LIGHT=1 & SENSOR0=1 & SENSOR1=0 -> CURRENT_LIGHT=0
-
-START   ORC     RR
-        IEN     RR
-        OEN     RR
-        JMP     SWITCH
-
-LOOP    LDC     CURRENT_LIGHT
-        ANDC    SENSOR0
-        AND     SENSOR1
-        SKZ
-        JMP     SWITCH
-
-        LD      CURRENT_LIGHT
-        AND     SENSOR0
-        ANDC    SENSOR1
-        SKZ
-        JMP     SWITCH
-
-        JMP LOOP
-
-SWITCH  LDC     CURRENT_LIGHT
-        STO     CURRENT_LIGHT
-        STOC    LIGHT0
-        STO     LIGHT1
-        JMP     LOOP
+START	ORC RR
+	    IEN RR
+	    OEN RR
+	    STO TMP0
+	    XNOR TMP0
+LOOP    LDC RR
+	    STO TMP0
+	    STO TMP1
+	    STO TMP2
+	    JMP LOOP
