@@ -28,6 +28,12 @@ always_comb rtn <= instruction_register == RTN;
 always_comb jmp <= instruction_register == JMP;
 
 always_comb rr_out <= result_register;
+always_comb write <= !rst &&
+							!skip_register &&
+							oen_register &&
+							!clk &&
+							(instruction_register == STO || instruction_register == STOC) &&
+							(instruction == STO || instruction == STOC);
 
 always @(negedge clk) begin
   instruction_register <= instruction;
@@ -37,17 +43,10 @@ always @(negedge clk) begin
   else
     skip_register = instruction == RTN | (instruction == SKZ & ~result_register);
   
-  if (!rst) begin
-    if (!skip_register & oen_register) begin
-      if (instruction == STO) begin
-        data_out <= result_register;
-        write <= '1;
-      end else if (instruction == STOC) begin
-        data_out <= ~result_register;
-        write <= '1;
-      end else write <= '0;
-    end else write <= '0;
-  end else write <= '0;
+  if (!rst & !skip_register & oen_register) begin
+    if (instruction == STO) data_out <= result_register;
+    else if (instruction == STOC) data_out <= ~result_register;
+  end
 end
 
 logic data_in_masked;

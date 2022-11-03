@@ -27,10 +27,9 @@ module MC14500B
 	always_comb data_in = address_copy == '1 ? rr_out : data_from_ram;
 	always_comb address = cmd[ADDR-1:0];
 	
-	RAM #(.SIZE_LOG(ADDR)) 					ram 	(!clk, 
-															!data_write, 
+	RAM #(.SIZE_LOG(ADDR)) 			ram 	(!data_write, 
 															data_write, 
-															address, 
+															address_copy, 
 															data_out, 
 															data_from_ram);
 	ROM #(.WORD(WORD), .SIZE_LOG(ADDR))	rom 	(!program_write,

@@ -29,7 +29,7 @@ module MC14500B_tests();
 		program_code[6] = 12'h800;
 		program_code[7] = 12'h801;
 		program_code[8] = 12'h802;
-		program_code[9] = 12'hC04;
+		program_code[9] = 12'hC05;
 		#(20);
 		rst = '1;
 		#(50);
