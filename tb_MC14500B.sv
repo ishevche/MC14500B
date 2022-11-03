@@ -20,16 +20,7 @@ module MC14500B_tests();
 
 	integer i;
 	initial begin
-		program_code[0] = 12'h6ff;
-		program_code[1] = 12'hAff;
-		program_code[2] = 12'hBff;
-		program_code[3] = 12'h800;
-		program_code[4] = 12'h700;
-		program_code[5] = 12'h2ff;
-		program_code[6] = 12'h800;
-		program_code[7] = 12'h801;
-		program_code[8] = 12'h802;
-		program_code[9] = 12'hC05;
+		$readmemh("out.txt", program_code);
 		#(20);
 		rst = '1;
 		#(50);
