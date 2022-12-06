@@ -15,12 +15,12 @@ module ICU (
   );
 
 
-logic result_register;
+logic result_register = '0;
 instruction_t instruction_register;
 
-logic ien_register;
-logic oen_register;
-logic skip_register;
+logic ien_register = '0;
+logic oen_register = '0;
+logic skip_register = '0;
 
 always_comb flag_o <= instruction_register == NOPO;
 always_comb flag_f <= instruction_register == NOPF;
@@ -35,7 +35,7 @@ always_comb write <= !rst &&
 							(instruction_register == STO || instruction_register == STOC) &&
 							(instruction == STO || instruction == STOC);
 
-always @(negedge clk) begin
+always_ff @(negedge clk) begin
   instruction_register <= instruction;
   
   if (skip_register | rst)
@@ -52,7 +52,7 @@ end
 logic data_in_masked;
 always_comb data_in_masked <= data_in & ien_register;
 
-always @(posedge clk) begin
+always_ff @(posedge clk) begin
   if (rst) begin
     ien_register <= '0;
     oen_register <= '0;

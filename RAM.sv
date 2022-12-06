@@ -10,9 +10,13 @@ module RAM
 		);
 	
 	logic [WORD-1:0] ram [0:SIZE-1];
-  logic [SIZE_LOG-1:0] address_buff;
-  
-  always @(posedge write) address_buff = address;
+   logic [SIZE_LOG-1:0] address_buff = '0;
+	
+   initial
+		for (int i = 0; i < SIZE; ++i)
+			ram[i] = '0;
+		
+  always_ff @(posedge write) address_buff = address;
 	
 	always_latch begin
 		if (write) ram[address_buff] = data_in;

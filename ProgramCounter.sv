@@ -10,7 +10,7 @@ module ProgramCounter
 	
 	always_comb address_out <= counter;
 	
-	always @(negedge clk) begin
+	always_ff @(negedge clk) begin
 		if (rst)
 			counter = '0;
 		else if (write)

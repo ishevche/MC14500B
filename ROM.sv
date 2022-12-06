@@ -11,6 +11,10 @@ module ROM
 	
 	logic [WORD-1:0] rom [0:SIZE-1];
 	
+	initial
+		for (int i = 0; i < SIZE; i = i + 1)
+			rom[i] = '0;
+	
 	always_latch begin
 		if (write) rom[address] = data_in;
 		if (read)  data_out = rom[address];
