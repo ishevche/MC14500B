@@ -36,7 +36,7 @@ module ICU (
                         !clk &&
                         (instruction_register == STO || instruction_register == STOC) &&
                         (instruction == STO || instruction == STOC);
-  
+
   always_ff @(negedge clk) begin
     if (!rst) begin
       instruction_register <= instruction;
