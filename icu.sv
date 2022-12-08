@@ -52,7 +52,8 @@ module ICU (
         else if (instruction == STOC)
           out_register <= ~result_register;
       end
-    end
+    end else
+      skip_register <= '0;
   end
   
   logic data_in_masked;
@@ -65,13 +66,13 @@ module ICU (
       result_register <= '0;
     end else if (!skip_register) begin
       case (instruction_register)
-        AND:  result_register <=  result_register & data_in_masked;
-        ANDC: result_register <= ~result_register & data_in_masked;
-        OR:   result_register <=  result_register | data_in_masked;
-        ORC:  result_register <=  ien_register ? (~result_register | data_in_masked) : '1;
-        XNOR: result_register <= ~result_register ^ data_in_masked;
+        AND:  result_register <=  result_register &  data_in_masked;
+        ANDC: result_register <=  result_register & ~data_in_masked;
+        OR:   result_register <=  result_register |  data_in_masked;
+        ORC:  result_register <=  result_register | ~data_in_masked;
+        XNOR: result_register <=  result_register ^ ~data_in_masked;
         LD:   result_register <=  data_in_masked;
-        LDC:  result_register <=  ien_register ? ~data_in_masked : '1;
+        LDC:  result_register <=  ~data_in_masked;
         IEN:  ien_register    <=  data_in;
         OEN:  oen_register    <=  data_in_masked;
       endcase
