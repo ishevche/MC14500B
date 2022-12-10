@@ -30,31 +30,51 @@ module ICU_test ();
     
     $display("RESET was successfull. Testing ...");
     
+    `run_with_input(IEN, '0);
+    `test("IEN", cpu.ien_register == '0);
+    
     `run_with_input(IEN, '1);
     `test("IEN", cpu.ien_register == '1);
     
-    `run(OEN);
+    `run_with_input(OEN, '0);
+    `test("OEN", cpu.oen_register == '0);
+    
+    `run_with_input(OEN, '1);
     `test("OEN", cpu.oen_register == '1);
     
-    `run(LD);
-    `test("LD",  rr_out == '1);
+    `run_with_input(LD, '1);
+    `test("LD", rr_out == '1);
     
-    `run_with_input(OR,  '0);
-    `test("OR",  rr_out == '1);
+    `run_with_input(LDC, '0);
+    `test("LDC", rr_out == '1);
+    
+    `run_with_input(OR, '0);
+    `test("OR", rr_out == '1);
+    
+    `run_with_input(OR, '1);
+    `test("OR", rr_out == '1);
     
     `run(STO);
-    `test("STO1", data_out == '1);
+    `test("STO", data_out == '1);
+    
+    `run_with_input(AND, '1);
+    `test("AND", rr_out == '1);
     
     `run_with_input(AND, '0);
     `test("AND", rr_out == '0);
     
     `run(STO);
-    `test("STO2", data_out == '0);
+    `test("STO", data_out == '0);
     
     `run(NOPO);
     `test("NOPO", flag_o == '1);
+    `test("NOPO", flag_f == '0);
     
-    // $display("TESTS PASSED SUCCESSFULLY")
+    `run(NOPF);
+    `test("NOPF", flag_o == '0);
+    `test("NOPF", flag_f == '1);
+    
+    $display("Testing finished");
     
     #(200);
   end
