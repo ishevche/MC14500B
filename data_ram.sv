@@ -4,8 +4,7 @@ module DataRAM
     parameter SIZE = 2 ** SIZE_LOG,
     parameter INPUT = 5,
     parameter OUTPUT = 5)
-  ( input  logic                    reset,
-    input  logic                    write,
+  ( input  logic                    write,
     input  logic   [SIZE_LOG - 1:0] address,
     input  logic   [WORD - 1:0]     data_in,
     output logic   [WORD - 1:0]     data_out,
@@ -26,9 +25,7 @@ module DataRAM
   always_comb data_out <= out_register;
   
   always_ff @(posedge write) begin
-    if (reset)
-      memory[address] <= '0;
-    else if (address < OUTPUT)
+    if (address < OUTPUT)
       output_pins[address] <= data_in;
     else if (address >= OUTPUT + INPUT)
       memory[address] <= data_in;

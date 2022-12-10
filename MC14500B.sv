@@ -4,16 +4,13 @@ module MC14500B
     parameter CODE = 4,
     parameter WORD = ADDR + CODE,
     parameter INPUT = 5,
-    parameter OUTPUT = 5,
-    parameter AUTORESET = 1)
+    parameter OUTPUT = 5)
   ( input  logic                clk,
-    input  logic                rst,
+    input  logic                reset,
     input  logic                program_write,
     input  logic [WORD - 1:0]   program_cmd,
     input  logic [INPUT - 1:0]  input_pins,
     output logic [OUTPUT - 1:0] output_pins);
-    
-  logic rst_register = '1;
     
   logic [ADDR - 1:0]      address       = '0;
   logic                   data_in       = '0;
@@ -40,10 +37,17 @@ module MC14500B
   logic data_write_register = '0;
   always_comb data_write_register <= data_write;
   
+  logic pc_reset;
+  logic icu_reset;
+  
+  ResetModule reset_module (clk,
+                            !reset,
+                            pc_reset,
+                            icu_reset);
+  
   DataRAM #(.SIZE_LOG(ADDR),
             .INPUT(INPUT),
-            .OUTPUT(OUTPUT)) ram (rst,
-                                  data_write_register,
+            .OUTPUT(OUTPUT)) ram (data_write_register,
                                   address,
                                   data_out,
                                   data_from_ram,
@@ -57,13 +61,13 @@ module MC14500B
                                           cmd);
                              
   ProgramCounter #(.SIZE(ADDR)) cnt (clk,
-                                     !rst_register,
+                                     pc_reset,
                                      JMP_FLAG,
                                      address,
                                      counter);
   ICU icu (clk,
            data_in,
-           !rst_register,
+           icu_reset,
            opcode,
            data_write,
            data_out,
