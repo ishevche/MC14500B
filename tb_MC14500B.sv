@@ -11,8 +11,4 @@ module MC14500B_tests();
 									
 	always
 		#(50) clk = ~clk;
-  
-  initial begin
-    # (180) rst = '0; #(250) rst = '1;
-	end
 endmodule

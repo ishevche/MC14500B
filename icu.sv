@@ -21,21 +21,24 @@ module ICU (
   logic oen_register  = '0;
   logic skip_register = '0;
   
-  logic out_register = '0;
-  always_comb data_out <= out_register;
+  logic out_register  = '0;
+  always_comb data_out <= out_register; // LOW as default
   
-  always_comb flag_o  <= !rst && instruction_register == NOPO;
-  always_comb flag_f  <= !rst && instruction_register == NOPF;
-  always_comb rtn     <= !rst && instruction_register == RTN;
-  always_comb jmp     <= !rst && instruction_register == JMP;
+  logic enabled;
+  always_comb enabled <= !rst && !skip_register;
+  
+  always_comb flag_o  <= enabled && instruction_register == NOPO;
+  always_comb flag_f  <= enabled && instruction_register == NOPF;
+  always_comb rtn     <= !rst    && instruction_register == RTN;
+  always_comb jmp     <= enabled && instruction_register == JMP;
   
   always_comb rr_out <= result_register;
-  always_comb write <=  !rst &&
-                        !skip_register &&
-                        oen_register &&
+  
+  always_comb write  <= enabled &&
                         !clk &&
-                        (instruction_register == STO || instruction_register == STOC) &&
-                        (instruction == STO || instruction == STOC);
+                        oen_register &&
+                        (instruction == STO || instruction == STOC) &&
+                        (instruction_register == STO || instruction_register == STOC);
 
   always_ff @(negedge clk) begin
     if (!rst) begin
@@ -46,7 +49,7 @@ module ICU (
       else
         skip_register = instruction == RTN | (instruction == SKZ & ~result_register);
       
-      if (!rst & !skip_register & oen_register) begin
+      if (enabled & oen_register) begin
         if (instruction == STO)
           out_register <=  result_register;
         else if (instruction == STOC)

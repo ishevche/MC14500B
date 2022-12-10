@@ -1,7 +1,5 @@
-`timescale 1ns / 1ns
-
-module IC_test ();
-  logic clk = 0;
+module ICU_test ();
+  logic clk = '0;
   logic data_in;
   logic rst;
   logic write;
