@@ -18,21 +18,43 @@ module ICU_test ();
     #(50) clk = ~clk;
   end
   
-  `define run_with_input(instruction, input) #(80); input; #(20); i = instruction; 
-  `define run(instruction) #(100); i = instruction;
+  `define run_with_input(instruction, data) data_in = data; i = instruction; #(100)
+  `define run(instruction) i = instruction; #(100)
+  `define test(test_name, expected) $display("%s\t TEST %s", test_name, ((expected) ? "PASSED" : "FAILED"));
   
   initial begin
     rst = '1;
-    #(190);
+    #(280);
     rst = '0;
+    #(10);
     
-    `run_with_input(IEN, data_in = '1);
+    $display("RESET was successfull. Testing ...");
+    
+    `run_with_input(IEN, '1);
+    `test("IEN", cpu.ien_register == '1);
+    
     `run(OEN);
+    `test("OEN", cpu.oen_register == '1);
+    
     `run(LD);
-    `run_with_input(OR, data_in = '0);
-    `run_with_input(AND, data_in = '0);
+    `test("LD",  rr_out == '1);
+    
+    `run_with_input(OR,  '0);
+    `test("OR",  rr_out == '1);
+    
     `run(STO);
+    `test("STO1", data_out == '1);
+    
+    `run_with_input(AND, '0);
+    `test("AND", rr_out == '0);
+    
+    `run(STO);
+    `test("STO2", data_out == '0);
+    
     `run(NOPO);
+    `test("NOPO", flag_o == '1);
+    
+    // $display("TESTS PASSED SUCCESSFULLY")
     
     #(200);
   end
