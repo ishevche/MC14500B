@@ -1,4 +1,4 @@
-import instructions::instruction_t;
+import instructions::*;
 
 module MC14500B_tests();
 	logic clk = '0;

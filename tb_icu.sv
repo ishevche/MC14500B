@@ -1,6 +1,8 @@
+import instructions::*;
+
 module ICU_test ();
   logic clk = '0;
-  logic data_in;
+  logic data_in = '0;
   logic rst;
   logic write;
   logic data_out;
@@ -9,7 +11,7 @@ module ICU_test ();
   logic flag_o;
   logic flag_f;
   logic rr_out;
-  instruction_t i;
+  instruction_t i = NOPO;
   ICU cpu(clk, data_in, rst, i, write, data_out, jmp, rtn, flag_o, flag_f, rr_out);
   
   always begin
