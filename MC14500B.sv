@@ -31,8 +31,10 @@ module MC14500B
   
   instruction_t opcode;
   always_comb opcode <= instruction_t'(cmd[WORD - 1:ADDR]);
-  always_comb data_in <= address == '1 ? rr_out : data_from_ram_register;
   always_comb address <= cmd[ADDR - 1:0];
+  
+  always_ff @(negedge clk)
+    data_in <= address == '1 ? rr_out : data_from_ram_register;
   
   logic data_write_register = '0;
   always_comb data_write_register <= data_write;
