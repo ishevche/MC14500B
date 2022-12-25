@@ -1,13 +1,16 @@
 module MC14516B_tests;
 
-logic reset = '0;
-logic pe = '0;
-logic ud = '0;
-logic clk = '0;
-logic ci = '0;
-logic [3:0] preset = '0;
+logic 		reset 	= '0;
+logic 		pe 		= '0;
+logic 		ud 		= '0;
+logic 		clk 		= '1;
+logic 		ci 		= '0;
+logic [3:0] preset 	= '0;
 logic [3:0] result;
-logic co;
+logic 		co;
+logic [3:0] stored	= '0;
+logic			carry_o	= '0;
+logic 		failed 	= '0;
 
 MC14516B counter(.reset(reset),
 					  .preset_enable(pe),
@@ -19,64 +22,61 @@ MC14516B counter(.reset(reset),
 					  .carry_out(co));
 
 initial begin
-	for (logic [4:0] i = '0; !i[4]; ++i) begin
-		preset = i[3:0];
-		pe = 1;
+	for (logic [13:0] iter = '0; !iter[13]; ++iter) begin
+		preset = iter[12:9];
+		pe = 1; #(1); 
+		pe = 0; #(1);
+		stored = preset;
+		
+		reset = iter[8];
+		pe = iter[7];
+		ud = iter[6];
+		ci = iter[5];
+		preset = iter[4:1];
+		clk = iter[0];
+		carry_o 	 = !(stored == '1 && ud && !ci) && 
+						!(stored == '0 && !ud && !ci);
 		#(1);
-		pe = 0;
-		#(1);
-		if (result != preset) begin
-			$display("Failed to preset %d, result = %d", i, result);
-			break;
-		end
-		ci = 1;
-		clk = 1;
-		#(1);
-		clk = 0;
-		#(1);
-		if (result != preset) begin
-			$display("Change while ci = 1, result = %d", result);
-			break;
-		end
-		ci = 0;
-		ud = 1;
-		clk = 1;
-		#(1);
-		if (result != preset + 1'b1) begin
-			$display("Unable to add, result = %d", result);
-			break;
-		end
-		clk = 0;
-		#(1);
-		if (result != preset + 1'b1) begin
-			$display("Changed on negedge, result = %d", result);
-			break;
+		
+		if (reset) begin
+			pe = '0;
+			reset = '0; #(1);
+			if (result != '0) begin
+				$display("Failed to reset, iter = %d, result = %d, co = %d", iter, result, co);
+				failed = '1;
+			end
 		end
 		
-		pe = 1;
-		#(1);
-		pe = 0;
-		#(1)
+		else if (pe) begin
+			pe = '0; #(1);
+			if (result != preset) begin
+				$display("Failed to preset, iter = %d, result = %d, co = %d", iter, result, co);
+				failed = '1;
+			end
+		end
 		
-		ud = 0;
-		clk = 1;
-		#(1);
-		if (result != preset - 1'b1) begin
-			$display("Unable to sub, result = %d", result);
-			break;
+		else if (ci || !clk) begin
+			if (result != stored) begin
+				$display("Unnecessary change, iter = %d, result = %d, co = %d", iter, result, co);
+				failed = '1;
+			end
 		end
-		clk = 0;
-		#(1);
-		if (result != preset - 1'b1) begin
-			$display("Changed on negefge, result = %d", result);
-			break;
+		
+		else if (ud) begin
+			if (result != stored + 1'b1 || carry_o != co) begin
+				$display("Wrong addition, iter = %d, result = %d, co = %d", iter, result, co);
+				failed = '1;
+			end
 		end
+		
+		else begin
+			if (result != stored - 1'b1 || carry_o != co) begin
+				$display("Wrong substraction, iter = %d, result = %d, co = %d", iter, result, co);
+				failed = '1;
+			end
+		end
+		
 	end
-	$display("reset = %d", reset);
-	$display("preset_enable = %d", pe);
-	$display("up_down = %d", ud);
-	$display("carry_in = %d", ci);
-	$display("preset = %d", preset);
 end
 
 endmodule

@@ -1,82 +1,85 @@
-import instructions::instruction_t;
-module MC14500B
-  #(parameter ADDR = 8,
-    parameter CODE = 4,
-    parameter WORD = ADDR + CODE,
-    parameter INPUT = 5,
-    parameter OUTPUT = 5)
-  ( input  logic                clk,
-    input  logic                reset,
-    input  logic                program_write,
-    input  logic [WORD - 1:0]   program_cmd,
-    input  logic [INPUT - 1:0]  input_pins,
-    output logic [OUTPUT - 1:0] output_pins);
-    
-  logic [ADDR - 1:0]      address       = '0;
-  logic                   data_in       = '0;
+import instructions::*;
+
+module MC14500B (
+    input logic         clk,
+    input logic         data_in,
+    input logic         rst,
+    input instruction_t instruction,
+    output logic        write,
+    output logic        data_out,
+    output logic        jmp,
+    output logic        rtn,
+    output logic        flag_o,
+    output logic        flag_f,
+    output logic        rr_out
+  );
+
+  logic result_register = '0;
+  instruction_t instruction_register = NOPO;
   
-  wire logic [ADDR - 1:0] counter      ;
-  wire logic [WORD - 1:0] cmd          ;
-  wire logic              JMP_FLAG     ;
-  wire logic              RTN_FLAG     ;
-  wire logic              FLAG_O       ;
-  wire logic              FLAG_F       ;
-  wire logic              data_out     ;
-  wire logic              data_write   ;
-  wire logic              rr_out       ;
-  wire logic              data_from_ram;
-  logic                   data_from_ram_register = '0;
+  logic ien_register  = '0;
+  logic oen_register  = '0;
+  logic skip_register = '0;
   
-  always_comb data_from_ram_register <= data_from_ram;
+  logic out_register  = '0;
+  always_comb data_out <= out_register; // LOW as default
   
-  instruction_t opcode;
-  always_comb opcode <= instruction_t'(cmd[WORD - 1:ADDR]);
-  always_comb address <= cmd[ADDR - 1:0];
+  logic enabled;
+  always_comb enabled <= !rst && !skip_register;
   
-  always_ff @(negedge clk)
-    data_in <= address == '1 ? rr_out : data_from_ram_register;
+  always_comb flag_o  <= enabled && instruction_register == NOPO;
+  always_comb flag_f  <= enabled && instruction_register == NOPF;
+  always_comb rtn     <= !rst    && instruction_register == RTN;
+  always_comb jmp     <= enabled && instruction_register == JMP;
   
-  logic data_write_register = '0;
-  always_comb data_write_register <= data_write;
+  always_comb rr_out <= result_register;
   
-  logic pc_reset;
-  logic icu_reset;
+  always_comb write  <= enabled &&
+                        !clk &&
+                        oen_register &&
+                        (instruction == STO || instruction == STOC) &&
+                        (instruction_register == STO || instruction_register == STOC);
+
+  always_ff @(negedge clk) begin
+    if (!rst) begin
+      instruction_register <= instruction;
+      
+      if (skip_register)
+        skip_register = '0;
+      else
+        skip_register = instruction == RTN | (instruction == SKZ & ~result_register);
+      
+      if (enabled & oen_register) begin
+        if (instruction == STO)
+          out_register <=  result_register;
+        else if (instruction == STOC)
+          out_register <= ~result_register;
+      end
+    end else
+      skip_register <= '0;
+  end
   
-  ResetModule reset_module (clk,
-                            !reset,
-                            pc_reset,
-                            icu_reset);
+  logic data_in_masked;
+  always_comb data_in_masked <= data_in & ien_register;
   
-  DataRAM #(.SIZE_LOG(ADDR),
-            .INPUT(INPUT),
-            .OUTPUT(OUTPUT)) ram (data_write_register,
-                                  address,
-                                  data_out,
-                                  data_from_ram,
-                                  input_pins,
-                                  output_pins);
-  TextRAM #(.WORD(WORD),
-            .SIZE_LOG(ADDR),
-            .INIT_FILE("text.txt")) text (program_write,
-                                          counter,
-                                          program_cmd,
-                                          cmd);
-                             
-  ProgramCounter #(.SIZE(ADDR)) cnt (clk,
-                                     pc_reset,
-                                     JMP_FLAG,
-                                     address,
-                                     counter);
-  ICU icu (clk,
-           data_in,
-           icu_reset,
-           opcode,
-           data_write,
-           data_out,
-           JMP_FLAG,
-           RTN_FLAG,
-           FLAG_O,
-           FLAG_F,
-           rr_out);
+  always_ff @(posedge clk) begin
+    if (rst) begin
+      ien_register    <= '0;
+      oen_register    <= '0;
+      result_register <= '0;
+    end else if (!skip_register) begin
+      case (instruction_register)
+        AND:  result_register <=  result_register &  data_in_masked;
+        ANDC: result_register <=  result_register & ~data_in_masked;
+        OR:   result_register <=  result_register |  data_in_masked;
+        ORC:  result_register <=  result_register | ~data_in_masked;
+        XNOR: result_register <=  result_register ^ ~data_in_masked;
+        LD:   result_register <=  data_in_masked;
+        LDC:  result_register <=  ~data_in_masked;
+        IEN:  ien_register    <=  data_in;
+        OEN:  oen_register    <=  data_in_masked;
+      endcase
+    end
+  end
 
 endmodule
