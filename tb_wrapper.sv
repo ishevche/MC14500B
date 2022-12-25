@@ -14,7 +14,9 @@ module Wrapper_tests
             .INPUT_SIZE(INPUT_SIZE),
             .OUTPUT_SIZE(OUTPUT_SIZE)) wrapper (
     clk,
-    reset);
+    reset,
+    input_pins,
+    output_pins);
                                       
 	always
 		#(50) clk = ~clk;

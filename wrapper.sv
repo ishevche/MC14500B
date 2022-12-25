@@ -9,7 +9,7 @@ module Wrapper
   ( input  logic clk,
     input  logic reset,
     input  logic [INPUT_SIZE - 1:0] input_pins,
-    output logic [OUTPUT_SIZE - 1:0] output_pins);
+    output logic output_pins [OUTPUT_SIZE - 1:0]);
     
   logic [ADDR_WIDTH - 1:0] address = '0;
   logic data_in = '0;
@@ -76,6 +76,9 @@ module Wrapper
     .data_out(instruction_block),
     .address(instruction_pointer));
   
+  logic io_output_pins [OUTPUT_SIZE - 1:0];
+  always_comb output_pins[address] <= reset;
+  
   IOBlock #(.ADDR_WIDTH(ADDR_WIDTH),
             .INPUT_SIZE(INPUT_SIZE),
             .OUTPUT_SIZE(OUTPUT_SIZE)) io (
@@ -84,7 +87,7 @@ module Wrapper
     .data_out(data_io),
     .address(address),
     .input_pins(input_pins),
-    .output_pins(output_pins)
+    .output_pins(io_output_pins)
   );
                              
   ProgramCounter #(.ADDR_WIDTH(ADDR_WIDTH)) cnt (
