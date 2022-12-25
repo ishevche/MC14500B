@@ -19,9 +19,7 @@ module ResetModule
     end
   end
   
-  always_ff @(posedge clk) begin
-    icu_reset_register <= pc_reset_register;
-  end
+  always_ff @(posedge clk) icu_reset_register <= pc_reset_register;
   
   always_comb pc_reset <= pc_reset_register;
   always_comb icu_reset <= icu_reset_register;

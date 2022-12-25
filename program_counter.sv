@@ -1,12 +1,12 @@
 module ProgramCounter 
-  #(parameter SIZE = 8)
-  ( input  logic              clk,
-    input  logic              reset,
-    input  logic              write,
-    input  logic [SIZE - 1:0] address_in,
-    output logic [SIZE - 1:0] address_out);
-     
-  logic [SIZE - 1:0] counter = '0;
+  #(parameter ADDR_WIDTH)
+  ( input  logic clk,
+    input  logic reset,
+    input  logic write,
+    input  logic [ADDR_WIDTH - 1:0] address_in,
+    output logic [ADDR_WIDTH - 1:0] address_out);
+    
+  logic [ADDR_WIDTH - 1:0] counter = '0;
   
   always_comb address_out <= counter;
   
@@ -18,4 +18,5 @@ module ProgramCounter
     else 
       counter += 1'b1;
   end
+  
 endmodule

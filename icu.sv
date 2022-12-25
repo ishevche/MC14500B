@@ -15,31 +15,31 @@ module ICU (
   );
 
   logic result_register = '0;
+  logic ien_register    = '0;
+  logic oen_register    = '0;
+  logic skip_register   = '0;
+  logic out_register    = '0;
+  
   instruction_t instruction_register = NOPO;
   
-  logic ien_register  = '0;
-  logic oen_register  = '0;
-  logic skip_register = '0;
-  
-  logic out_register  = '0;
-  always_comb data_out <= out_register; // LOW as default
-  
   logic enabled;
-  always_comb enabled <= !rst && !skip_register;
+  always_comb enabled <= ~rst & ~skip_register;
+ 
+  always_comb flag_o  <= enabled & instruction_register == NOPO;
+  always_comb flag_f  <= enabled & instruction_register == NOPF;
+  always_comb rtn     <= ~rst    & instruction_register == RTN;
+  always_comb jmp     <= enabled & instruction_register == JMP;
   
-  always_comb flag_o  <= enabled && instruction_register == NOPO;
-  always_comb flag_f  <= enabled && instruction_register == NOPF;
-  always_comb rtn     <= !rst    && instruction_register == RTN;
-  always_comb jmp     <= enabled && instruction_register == JMP;
+  always_comb rr_out   <= result_register;
+  always_comb data_out <= out_register;
   
-  always_comb rr_out <= result_register;
-  
-  always_comb write  <= enabled &&
-                        !clk &&
-                        oen_register &&
-                        (instruction == STO || instruction == STOC) &&
-                        (instruction_register == STO || instruction_register == STOC);
+  always_comb write  <= enabled &
+                        ~clk &
+                        oen_register &
+                        (instruction == STO | instruction == STOC) &
+                        (instruction_register == STO | instruction_register == STOC);
 
+  
   always_ff @(negedge clk) begin
     if (!rst) begin
       instruction_register <= instruction;
@@ -62,7 +62,7 @@ module ICU (
   logic data_in_masked;
   always_comb data_in_masked <= data_in & ien_register;
   
-  always_ff @(posedge clk) begin
+  always_ff @(posedge clk or posedge rst) begin
     if (rst) begin
       ien_register    <= '0;
       oen_register    <= '0;
