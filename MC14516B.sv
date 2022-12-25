@@ -12,10 +12,6 @@ module MC14516B
 logic [SIZE-1:0] counter = '0;
 
 always_ff @(posedge clock or posedge reset or posedge preset_enable) begin
-	if (up_down) 
-		carry_out <= |(counter^'1) | carry_in;
-	else
-		carry_out <= |counter | carry_in;
 	if (reset)
 		counter <= '0;
 	else if (preset_enable)
@@ -30,6 +26,10 @@ end
 
 always_comb begin
 	result <= counter;
+	if (up_down) 
+		carry_out <= |(counter^'1) | carry_in;
+	else
+		carry_out <= |counter | carry_in;
 end
 	
 endmodule
