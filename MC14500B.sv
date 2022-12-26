@@ -1,60 +1,85 @@
-import instructions::instruction_t;
-module MC14500B
-		#(parameter ADDR = 8,
-		  parameter CODE = 4,
-		  parameter WORD = ADDR+CODE)
-		(input logic 				clk,
-		 input logic 				rst,
-		 input logic 				program_write,
-		 input logic [WORD-1:0]	program_cmd, 
-		 output instruction_t	opcode);
-	
-	logic [ADDR-1:0] 			counter;
-	logic [WORD-1:0]		 	cmd;
-	logic [ADDR-1:0] 			address;
-	logic [ADDR-1:0] 			address_copy;
-	logic 						JMP_FLAG;
-	logic			 				RTN_FLAG;
-	logic 						FLAG_O;
-	logic			 				FLAG_F;
-	logic 						data_out;
-	logic 						data_write;
-	logic							rr_out;
-	logic	 						data_in;
-	logic	 						data_from_ram;
-	
-	always_comb opcode <= instruction_t'(cmd[WORD-1:ADDR]);
-	always_comb data_in = address_copy == '1 ? rr_out : data_from_ram;
-	always_comb address = cmd[ADDR-1:0];
-	
-	RAM #(.SIZE_LOG(ADDR)) 			ram 	(!data_write, 
-															data_write, 
-															address_copy, 
-															data_out, 
-															data_from_ram);
-	ROM #(.WORD(WORD), .SIZE_LOG(ADDR))	rom 	(!program_write,
-															program_write,
-															counter, 
-															program_cmd, 
-															cmd);
-	ProgramCounter #(.SIZE_LOG(ADDR))	cnt	(!clk, 
-															rst,
-															JMP_FLAG, 
-															address, 
-															counter);
-	ICU 											icu	(clk, 
-															data_in, 
-															rst, 
-															opcode, 
-															data_write, 
-															data_out, 
-															JMP_FLAG, 
-															RTN_FLAG, 
-															FLAG_O, 
-															FLAG_F, 
-															rr_out);
-															
-	always @(negedge clk)
-		address_copy <= address;
-	
+import instructions::*;
+
+module MC14500B (
+    input logic         clk,
+    input logic         data_in,
+    input logic         rst,
+    input instruction_t instruction,
+    output logic        write,
+    output logic        data_out,
+    output logic        jmp,
+    output logic        rtn,
+    output logic        flag_o,
+    output logic        flag_f,
+    output logic        rr_out
+  );
+
+  logic result_register = '0;
+  instruction_t instruction_register = NOPO;
+  
+  logic ien_register  = '0;
+  logic oen_register  = '0;
+  logic skip_register = '0;
+  
+  logic out_register  = '0;
+  always_comb data_out <= out_register; // LOW as default
+  
+  logic enabled;
+  always_comb enabled <= !rst && !skip_register;
+  
+  always_comb flag_o  <= enabled && instruction_register == NOPO;
+  always_comb flag_f  <= enabled && instruction_register == NOPF;
+  always_comb rtn     <= !rst    && instruction_register == RTN;
+  always_comb jmp     <= enabled && instruction_register == JMP;
+  
+  always_comb rr_out <= result_register;
+  
+  always_comb write  <= enabled &&
+                        !clk &&
+                        oen_register &&
+                        (instruction == STO || instruction == STOC) &&
+                        (instruction_register == STO || instruction_register == STOC);
+
+  always_ff @(negedge clk) begin
+    if (!rst) begin
+      instruction_register <= instruction;
+      
+      if (skip_register)
+        skip_register = '0;
+      else
+        skip_register = instruction == RTN | (instruction == SKZ & ~result_register);
+      
+      if (enabled & oen_register) begin
+        if (instruction == STO)
+          out_register <=  result_register;
+        else if (instruction == STOC)
+          out_register <= ~result_register;
+      end
+    end else
+      skip_register <= '0;
+  end
+  
+  logic data_in_masked;
+  always_comb data_in_masked <= data_in & ien_register;
+  
+  always_ff @(posedge clk) begin
+    if (rst) begin
+      ien_register    <= '0;
+      oen_register    <= '0;
+      result_register <= '0;
+    end else if (!skip_register) begin
+      case (instruction_register)
+        AND:  result_register <=  result_register &  data_in_masked;
+        ANDC: result_register <=  result_register & ~data_in_masked;
+        OR:   result_register <=  result_register |  data_in_masked;
+        ORC:  result_register <=  result_register | ~data_in_masked;
+        XNOR: result_register <=  result_register ^ ~data_in_masked;
+        LD:   result_register <=  data_in_masked;
+        LDC:  result_register <=  ~data_in_masked;
+        IEN:  ien_register    <=  data_in;
+        OEN:  oen_register    <=  data_in_masked;
+      endcase
+    end
+  end
+
 endmodule
