@@ -7,7 +7,7 @@ module processor
     input  logic [6:0]	input_pins,
     output logic [1:0] 	output_pins);
     
-  logic [2:0]      		  address  = '0;
+  logic [3:0]      		  address  = '0;
   logic                   data_in  = '0;
   logic [7:0]				  input_data	;
   
@@ -45,8 +45,6 @@ module processor
 									.result(counter[7:4]));
 									
   ProgramMemory memory	  (.address(counter),
-									.data_in('0),
-									.write('0),
 									.data_out(cmd));
 
   MC14500B icu   (.clk(clk),
@@ -61,7 +59,7 @@ module processor
 						.flag_f(FLAG_F),
 						.rr_out(rr_out));
 
-  MC145998 lower_output	  (.address(address[2:0]),
+  MC14599B lower_output	  (.address(address[2:0]),
 									.write(data_write),
 									.write_disable(clk),
 									.chip_enable(!address[3]),
@@ -69,7 +67,7 @@ module processor
 									.reset(reset),
 									.output_data(output_pins[0]));
   
-  MC145998 upper_output	  (.address(address[2:0]),
+  MC14599B upper_output	  (.address(address[2:0]),
 									.write(data_write),
 									.write_disable(clk),
 									.chip_enable(address[3]),

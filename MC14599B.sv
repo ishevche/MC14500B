@@ -9,7 +9,7 @@ module MC14599B
 	input  logic					reset,
 	output logic					output_data);
 
-logic [SIZE:0] data = '0;
+logic [SIZE-1:0] data = '0;
 	
 always_comb output_data <= data[address];
 
