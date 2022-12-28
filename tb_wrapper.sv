@@ -2,8 +2,8 @@ import instructions::*;
 
 module Wrapper_tests 
   #(parameter ADDR_WIDTH = 12,
-    parameter INPUT_SIZE = 5,
-    parameter OUTPUT_SIZE = 5) ();
+    parameter INPUT_SIZE = 8,
+    parameter OUTPUT_SIZE = 8) ();
   
 	logic clk = '0;
 	logic reset = '1;

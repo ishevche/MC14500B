@@ -4,14 +4,15 @@ module Wrapper
   #(parameter ADDR_WIDTH = 12,
     parameter INSTRUCTION_WIDTH = 4,
     parameter DATA_WIDTH = ADDR_WIDTH + INSTRUCTION_WIDTH,
-    parameter INPUT_SIZE = 5,
-    parameter OUTPUT_SIZE = 5)
+    parameter INPUT_SIZE = 8,
+    parameter OUTPUT_SIZE = 8)
   ( input  logic clk,
     input  logic reset,
     input  logic [INPUT_SIZE - 1:0] input_pins,
-    output logic output_pins [OUTPUT_SIZE - 1:0]);
-    
-  logic [ADDR_WIDTH - 1:0] address = '0;
+    output logic [OUTPUT_SIZE - 1:0] output_pins);
+  
+  logic [ADDR_WIDTH - 1:0] data_address = '0;
+  
   logic data_in = '0;
   
   wire logic [ADDR_WIDTH - 1:0] instruction_pointer;
@@ -25,35 +26,34 @@ module Wrapper
   wire logic rr_out;
   wire logic data_ram;
   wire logic data_io;
+  wire logic pc_reset;
+  wire logic icu_reset;
   
   logic data_mux = '0;
-  logic ram_select = '0;
-  logic io_select = '0;
+  logic ram_enable = '0;
+  logic io_enable = '0;
   always_comb begin
-    if (address == '1) begin
+    if (data_address == '1) begin
       data_mux <= rr_out;
-      ram_select <= '0;
-      io_select <= '0;
-    end else if (address < INPUT_SIZE + OUTPUT_SIZE) begin
+      ram_enable <= '0;
+      io_enable <= '0;
+    end else if (data_address < INPUT_SIZE + OUTPUT_SIZE) begin
       data_mux <= data_io;
-      ram_select <= '0;
-      io_select <= '1;
+      ram_enable <= '0;
+      io_enable <= '1;
     end else begin
       data_mux <= data_ram;
-      ram_select <= '1;
-      io_select <= '0;
+      ram_enable <= '1;
+      io_enable <= '0;
     end
   end
   
-  instruction_t opcode;
-  always_comb opcode <= instruction_t'(instruction_block[DATA_WIDTH - 1:ADDR_WIDTH]);
-  always_comb address <= instruction_block[ADDR_WIDTH - 1:0];
+  instruction_t instruction;
+  always_comb instruction <= instruction_t'(instruction_block[DATA_WIDTH - 1:ADDR_WIDTH]);
+  always_comb data_address <= instruction_block[ADDR_WIDTH - 1:0];
   
   always_ff @(negedge clk)
     data_in <= data_mux;
-  
-  wire logic pc_reset;
-  wire logic icu_reset;
   
   ResetModule reset_module (
     .clk(clk),
@@ -63,8 +63,8 @@ module Wrapper
   
   RAM #(.DATA_WIDTH(1),
         .ADDR_WIDTH(ADDR_WIDTH)) ram (
-    .write(ram_select & write),
-    .address(address),
+    .write(ram_enable & write),
+    .address(data_address),
     .data_in(data_out),
     .data_out(data_ram));
   
@@ -76,32 +76,29 @@ module Wrapper
     .data_out(instruction_block),
     .address(instruction_pointer));
   
-  logic io_output_pins [OUTPUT_SIZE - 1:0];
-  always_comb output_pins[address] <= reset;
-  
   IOBlock #(.ADDR_WIDTH(ADDR_WIDTH),
             .INPUT_SIZE(INPUT_SIZE),
             .OUTPUT_SIZE(OUTPUT_SIZE)) io (
-    .write(io_select & write),
+    .write(io_enable & write),
     .data_in(data_out),
     .data_out(data_io),
-    .address(address),
+    .address(data_address),
     .input_pins(input_pins),
-    .output_pins(io_output_pins)
+    .output_pins(output_pins)
   );
                              
   ProgramCounter #(.ADDR_WIDTH(ADDR_WIDTH)) cnt (
     .clk(clk),
     .reset(pc_reset),
     .write(jmp_flag),
-    .address_in(address),
+    .address_in(data_address),
     .address_out(instruction_pointer));
      
   ICU icu (
     .clk(clk),
     .data_in(data_in),
     .rst(icu_reset),
-    .instruction(opcode),
+    .instruction(instruction),
     .write(write),
     .data_out(data_out),
     .jmp(jmp_flag),
