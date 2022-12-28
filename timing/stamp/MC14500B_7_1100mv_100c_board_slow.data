@@ -1,0 +1,239 @@
+/*
+ Copyright (C) 2022  Intel Corporation. All rights reserved.
+ Your use of Intel Corporation's design tools, logic functions 
+ and other software and tools, and any partner logic 
+ functions, and any output files from any of the foregoing 
+ (including device programming or simulation files), and any 
+ associated documentation or information are expressly subject 
+ to the terms and conditions of the Intel Program License 
+ Subscription Agreement, the Intel Quartus Prime License Agreement,
+ the Intel FPGA IP License Agreement, or other applicable license
+ agreement, including, without limitation, that your use is for
+ the sole purpose of programming logic devices manufactured by
+ Intel and sold by Intel or its authorized distributors.  Please
+ refer to the applicable agreement for further details, at
+ https://fpgasoftware.intel.com/eula.
+*/
+MODELDATA
+/*MODELDATA HEADER*/
+/*
+ This file contains Slow Corner delays for the design using part 5CSEBA6U23I7
+ with speed grade 7, core voltage 1.1V, and temperature 100 Celsius
+
+*/
+DESIGN "MC14500B";
+TIMESCALE "1ns";
+
+
+
+
+
+TIMINGDATA
+
+ARCDATA
+pos_input_pins[0]__clk__setup:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("-1.184");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("-1.184");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_input_pins[1]__clk__setup:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("1.117");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("1.117");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_input_pins[2]__clk__setup:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("1.528");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("1.528");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_input_pins[3]__clk__setup:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("1.701");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("1.701");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_input_pins[4]__clk__setup:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("1.423");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("1.423");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_reset__clk__setup:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("-0.272");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("-0.272");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_input_pins[0]__clk__hold:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("7.211");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("7.211");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_input_pins[1]__clk__hold:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("6.597");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("6.597");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_input_pins[2]__clk__hold:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("6.292");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("6.292");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_input_pins[3]__clk__hold:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("6.150");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("6.150");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_input_pins[4]__clk__hold:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("6.326");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("6.326");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_reset__clk__hold:
+RISE_CONSTRAINT( scalar ) {
+VALUES ("6.766");
+}
+
+FALL_CONSTRAINT( scalar ) {
+VALUES ("6.766");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_clk__output_pins[0]__delay:
+CELL_RISE( scalar ) {
+VALUES ("15.286");
+}
+
+CELL_FALL( scalar ) {
+VALUES ("15.286");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_clk__output_pins[1]__delay:
+CELL_RISE( scalar ) {
+VALUES ("15.115");
+}
+
+CELL_FALL( scalar ) {
+VALUES ("15.115");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_clk__output_pins[2]__delay:
+CELL_RISE( scalar ) {
+VALUES ("15.340");
+}
+
+CELL_FALL( scalar ) {
+VALUES ("15.340");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_clk__output_pins[3]__delay:
+CELL_RISE( scalar ) {
+VALUES ("15.507");
+}
+
+CELL_FALL( scalar ) {
+VALUES ("15.507");
+}
+
+ENDARCDATA
+
+ARCDATA
+pos_clk__output_pins[4]__delay:
+CELL_RISE( scalar ) {
+VALUES ("13.622");
+}
+
+CELL_FALL( scalar ) {
+VALUES ("13.622");
+}
+
+ENDARCDATA
+
+ENDTIMINGDATA
+
+ENDMODELDATA

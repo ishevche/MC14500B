@@ -1,12 +1,8 @@
 db
 incremental_db
-simulation
 output_files
-
-MC14500B_*
-c5_pin_model_dump.txt
 *.bak
-MC14500B.qws
-
 *build*
 .*
+board
+simulation

@@ -16,7 +16,7 @@ module RAM
       $readmemh(INIT_FILE, memory);
   
   logic [DATA_WIDTH - 1:0] out_register = '0;
-  always_latch out_register <= ~write ? out_register : memory[address];
+  always_latch out_register <= write ? out_register : memory[address];
   always_comb data_out <= out_register;
   
   always_ff @(posedge write)

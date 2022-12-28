@@ -1,59 +1,48 @@
 import instructions::instruction_t;
 
 module Wrapper
-  #(parameter ADDR_WIDTH = 12,
+  #(parameter ADDR_WIDTH = 8,
     parameter INSTRUCTION_WIDTH = 4,
     parameter DATA_WIDTH = ADDR_WIDTH + INSTRUCTION_WIDTH,
-    parameter INPUT_SIZE = 8,
-    parameter OUTPUT_SIZE = 8)
+    parameter INPUT_SIZE = 5,
+    parameter OUTPUT_SIZE = 5)
   ( input  logic clk,
     input  logic reset,
+    input  logic program_write,
+    input  logic [DATA_WIDTH - 1:0] program_cmd,
     input  logic [INPUT_SIZE - 1:0] input_pins,
     output logic [OUTPUT_SIZE - 1:0] output_pins);
-  
-  logic [ADDR_WIDTH - 1:0] data_address = '0;
-  
+    
+  logic [ADDR_WIDTH - 1:0] address = '0;
   logic data_in = '0;
   
-  wire logic [ADDR_WIDTH - 1:0] instruction_pointer;
-  wire logic [DATA_WIDTH - 1:0] instruction_block;
+  wire logic [ADDR_WIDTH - 1:0] counter;
+  wire logic [DATA_WIDTH - 1:0] cmd;
   wire logic jmp_flag;
   wire logic rtn_flag;
   wire logic flag_o;
   wire logic flag_f;
   wire logic data_out;
-  wire logic write;
+  wire logic data_write;
   wire logic rr_out;
-  wire logic data_ram;
-  wire logic data_io;
-  wire logic pc_reset;
-  wire logic icu_reset;
+  wire logic data_from_ram;
+  wire logic data_from_io;
+  logic      data_from_ram_register = '0;
   
-  logic data_mux = '0;
-  logic ram_enable = '0;
-  logic io_enable = '0;
-  always_comb begin
-    if (data_address == '1) begin
-      data_mux <= rr_out;
-      ram_enable <= '0;
-      io_enable <= '0;
-    end else if (data_address < INPUT_SIZE + OUTPUT_SIZE) begin
-      data_mux <= data_io;
-      ram_enable <= '0;
-      io_enable <= '1;
-    end else begin
-      data_mux <= data_ram;
-      ram_enable <= '1;
-      io_enable <= '0;
-    end
-  end
+  always_comb data_from_ram_register <= data_from_ram;
   
-  instruction_t instruction;
-  always_comb instruction <= instruction_t'(instruction_block[DATA_WIDTH - 1:ADDR_WIDTH]);
-  always_comb data_address <= instruction_block[ADDR_WIDTH - 1:0];
+  instruction_t opcode;
+  always_comb opcode <= instruction_t'(cmd[DATA_WIDTH - 1:ADDR_WIDTH]);
+  always_comb address <= cmd[ADDR_WIDTH - 1:0];
   
   always_ff @(negedge clk)
-    data_in <= data_mux;
+    data_in <= address == '1 ? rr_out : ((address < INPUT_SIZE + OUTPUT_SIZE) ? data_from_io : data_from_ram_register);
+  
+  logic data_write_register = '0;
+  always_comb data_write_register <= data_write;
+  
+  logic pc_reset;
+  logic icu_reset;
   
   ResetModule reset_module (
     .clk(clk),
@@ -63,26 +52,26 @@ module Wrapper
   
   RAM #(.DATA_WIDTH(1),
         .ADDR_WIDTH(ADDR_WIDTH)) ram (
-    .write(ram_enable & write),
-    .address(data_address),
+    .write(data_write_register & (address > INPUT_SIZE + OUTPUT_SIZE)),
+    .address(address),
     .data_in(data_out),
-    .data_out(data_ram));
+    .data_out(data_from_ram));
   
   RAM #(.DATA_WIDTH(DATA_WIDTH),
         .ADDR_WIDTH(ADDR_WIDTH),
-        .INIT_FILE("program.mem")) program_code (
-    .write('0),
-    .data_in('0),
-    .data_out(instruction_block),
-    .address(instruction_pointer));
+        .INIT_FILE("program.mem")) text (
+    .write(program_write),
+    .address(counter),
+    .data_in(program_cmd),
+    .data_out(cmd));
   
   IOBlock #(.ADDR_WIDTH(ADDR_WIDTH),
             .INPUT_SIZE(INPUT_SIZE),
             .OUTPUT_SIZE(OUTPUT_SIZE)) io (
-    .write(io_enable & write),
+    .write(data_write & (address < INPUT_SIZE + OUTPUT_SIZE)),
     .data_in(data_out),
-    .data_out(data_io),
-    .address(data_address),
+    .data_out(data_from_io),
+    .address(address),
     .input_pins(input_pins),
     .output_pins(output_pins)
   );
@@ -91,20 +80,20 @@ module Wrapper
     .clk(clk),
     .reset(pc_reset),
     .write(jmp_flag),
-    .address_in(data_address),
-    .address_out(instruction_pointer));
-     
+    .address_in(address),
+    .address_out(counter));
+
   ICU icu (
     .clk(clk),
     .data_in(data_in),
     .rst(icu_reset),
-    .instruction(instruction),
-    .write(write),
+    .instruction(opcode),
+    .write(data_write),
     .data_out(data_out),
     .jmp(jmp_flag),
     .rtn(rtn_flag),
     .flag_o(flag_o),
     .flag_f(flag_f),
     .rr_out(rr_out));
-    
+
 endmodule

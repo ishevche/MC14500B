@@ -1,9 +1,9 @@
 import instructions::*;
 
 module Wrapper_tests 
-  #(parameter ADDR_WIDTH = 12,
-    parameter INPUT_SIZE = 8,
-    parameter OUTPUT_SIZE = 8) ();
+  #(parameter ADDR_WIDTH = 8,
+    parameter INPUT_SIZE = 5,
+    parameter OUTPUT_SIZE = 5) ();
   
 	logic clk = '0;
 	logic reset = '1;
@@ -13,10 +13,12 @@ module Wrapper_tests
 	Wrapper #(.ADDR_WIDTH(ADDR_WIDTH),
             .INPUT_SIZE(INPUT_SIZE),
             .OUTPUT_SIZE(OUTPUT_SIZE)) wrapper (
-    clk,
-    reset,
-    input_pins,
-    output_pins);
+    .clk(clk),
+    .reset(reset),
+    .input_pins(input_pins),
+    .output_pins(output_pins),
+    .program_write('0),
+    .program_cmd('0));
                                       
 	always
 		#(50) clk = ~clk;
