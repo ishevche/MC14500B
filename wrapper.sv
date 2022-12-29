@@ -34,9 +34,13 @@ module Wrapper
   instruction_t opcode;
   always_comb opcode <= instruction_t'(cmd[DATA_WIDTH - 1:ADDR_WIDTH]);
   always_comb address <= cmd[ADDR_WIDTH - 1:0];
+  logic [ADDR_WIDTH - 1:0] address_register = '0;
   
   always_ff @(negedge clk)
     data_in <= address == '1 ? rr_out : ((address < INPUT_SIZE + OUTPUT_SIZE) ? data_from_io : data_from_ram_register);
+  
+  always_ff @(negedge clk)
+    address_register <= address;
   
   logic data_write_register = '0;
   always_comb data_write_register <= data_write;
@@ -53,7 +57,7 @@ module Wrapper
   RAM #(.DATA_WIDTH(1),
         .ADDR_WIDTH(ADDR_WIDTH)) ram (
     .write(data_write_register & (address > INPUT_SIZE + OUTPUT_SIZE)),
-    .address(address),
+    .address(address_register),
     .data_in(data_out),
     .data_out(data_from_ram));
   
@@ -71,7 +75,7 @@ module Wrapper
     .write(data_write & (address < INPUT_SIZE + OUTPUT_SIZE)),
     .data_in(data_out),
     .data_out(data_from_io),
-    .address(address),
+    .address(address_register),
     .input_pins(input_pins),
     .output_pins(output_pins)
   );

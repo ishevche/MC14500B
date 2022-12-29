@@ -33,11 +33,22 @@ module ICU (
   always_comb rr_out   <= result_register;
   always_comb data_out <= out_register;
   
+  logic write_register = '0;
+  
   always_comb write <= enabled &
-                       (~clk) &
                        oen_register &
-                       (instruction == STO | instruction == STOC) &
+                       write_register &
                        (instruction_register == STO | instruction_register == STOC);
+  logic r_clk = '0;
+  wire logic w_xor_clk = r_clk ^ clk;
+  
+  always @(posedge w_xor_clk) begin
+    r_clk = ~r_clk;
+    if (r_clk)
+      write_register <= '0;
+    else
+      write_register <= 1'b1;
+  end
 
   
   always_ff @(negedge clk) begin
