@@ -4,7 +4,8 @@ module RAM
     parameter SIZE = 2 ** ADDR_WIDTH,
     parameter INIT_FILE = "")
   ( input  logic write,
-    input  logic [ADDR_WIDTH - 1:0] address,
+    input  logic [ADDR_WIDTH - 1:0] write_address,
+    input  logic [ADDR_WIDTH - 1:0] read_address,
     input  logic [DATA_WIDTH - 1:0] data_in,
     output logic [DATA_WIDTH - 1:0] data_out
   );
@@ -14,11 +15,11 @@ module RAM
   initial
     if (INIT_FILE != "")
       $readmemh(INIT_FILE, memory);
-  
+
   logic [DATA_WIDTH - 1:0] out_register = '0;
-  always_latch out_register <= write ? out_register : memory[address];
+  always_latch out_register <= write ? out_register : memory[read_address];
   always_comb data_out <= out_register;
   
   always_ff @(posedge write)
-    memory[address] <= data_in;
+    memory[write_address] <= data_in;
 endmodule

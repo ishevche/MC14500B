@@ -17,6 +17,7 @@ module Wrapper
   logic data_in = '0;
   
   wire logic [ADDR_WIDTH - 1:0] counter;
+  wire logic [ADDR_WIDTH - 1:0] uart_address;
   wire logic [DATA_WIDTH - 1:0] cmd;
   wire logic jmp_flag;
   wire logic rtn_flag;
@@ -57,7 +58,8 @@ module Wrapper
   RAM #(.DATA_WIDTH(1),
         .ADDR_WIDTH(ADDR_WIDTH)) ram (
     .write(data_write_register & (address > INPUT_SIZE + OUTPUT_SIZE)),
-    .address(address_register),
+    .read_address(address_register),
+	 .write_address(address_register),
     .data_in(data_out),
     .data_out(data_from_ram));
   
@@ -65,7 +67,8 @@ module Wrapper
         .ADDR_WIDTH(ADDR_WIDTH),
         .INIT_FILE("program.mem")) text (
     .write(program_write),
-    .address(counter),
+    .read_address(counter),
+	 .write_address(uart_address),
     .data_in(program_cmd),
     .data_out(cmd));
   
