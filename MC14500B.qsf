@@ -64,16 +64,7 @@ set_location_assignment PIN_AE24 -to output_pins[0]
 set_location_assignment PIN_AD20 -to output_pins[1]
 set_location_assignment PIN_AD17 -to output_pins[2]
 set_location_assignment PIN_AC22 -to output_pins[3]
-set_global_assignment -name SYSTEMVERILOG_FILE MC14500B.sv
-set_global_assignment -name SYSTEMVERILOG_FILE instructions.sv
-set_global_assignment -name SYSTEMVERILOG_FILE tb_MC14500B.sv
 set_location_assignment PIN_AH17 -to reset
-set_global_assignment -name SYSTEMVERILOG_FILE tb_MC14516B.sv
-set_global_assignment -name SYSTEMVERILOG_FILE MC14516B.sv
-set_global_assignment -name SYSTEMVERILOG_FILE tb_processor.sv
-set_global_assignment -name SYSTEMVERILOG_FILE processor.sv
-set_global_assignment -name SYSTEMVERILOG_FILE MC14599B.sv
-set_global_assignment -name SYSTEMVERILOG_FILE program_memory.sv
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
@@ -82,4 +73,25 @@ set_instance_assignment -name IO_STANDARD "2.5 V" -to output_pins[0]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to output_pins[1]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to output_pins[2]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to output_pins[3]
+set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH MC14599B -section_id eda_simulation
+set_global_assignment -name EDA_RUN_TOOL_AUTOMATICALLY ON -section_id eda_simulation
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name EDA_TEST_BENCH_NAME MC14516B -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id MC14516B
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME testbench_MC14516B -section_id MC14516B
+set_global_assignment -name SYSTEMVERILOG_FILE MC14500B.sv
+set_global_assignment -name SYSTEMVERILOG_FILE instructions.sv
+set_global_assignment -name SYSTEMVERILOG_FILE tb_MC14500B.sv
+set_global_assignment -name SYSTEMVERILOG_FILE tb_MC14516B.sv
+set_global_assignment -name SYSTEMVERILOG_FILE MC14516B.sv
+set_global_assignment -name SYSTEMVERILOG_FILE tb_processor.sv
+set_global_assignment -name SYSTEMVERILOG_FILE processor.sv
+set_global_assignment -name SYSTEMVERILOG_FILE MC14599B.sv
+set_global_assignment -name SYSTEMVERILOG_FILE program_memory.sv
+set_global_assignment -name TEXT_FILE testbenches/tb_cases.txt
+set_global_assignment -name EDA_TEST_BENCH_FILE testbenches/MC14516B/testbench_MC14516B.sv -section_id MC14516B
+set_global_assignment -name EDA_TEST_BENCH_NAME MC14599B -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id MC14599B
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME testbench_MC14599B -section_id MC14599B
+set_global_assignment -name EDA_TEST_BENCH_FILE testbenches/MC14599B/testbench_MC14599B.sv -section_id MC14599B

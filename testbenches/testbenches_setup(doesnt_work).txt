@@ -1,0 +1,7 @@
+quit -sim
+
+vlib work
+
+svlog ../../*.sv
+
+svlog *.sv
