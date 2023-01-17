@@ -38,6 +38,7 @@ module Wrapper
   
   always_comb
     address_register <= address;
+  
     
   logic pc_reset;
   logic icu_reset;
@@ -56,6 +57,22 @@ module Wrapper
   logic ack_out_cnt;
   logic ack_out_text;
   logic ack_out_ram;
+  
+  logic starter = '0;
+  logic [2:0] starter_counter = '0;
+  
+  always_ff @(negedge reset or posedge ack_out_text or posedge clk) begin
+    if (ack_out_text)
+      starter <= '0;
+    else begin
+      if (starter_counter <= 3)
+        starter_counter += 1'b1;
+      if (starter_counter == 2'b10)
+        starter <= '1;
+      else
+        starter <= '0;
+    end
+  end
   
   SB sb_ram_icu (
     .clk(clk),
@@ -94,7 +111,7 @@ module Wrapper
 	  .write_address(uart_address),
     .data_in(program_cmd),
     .data_out(cmd),
-    .req_prev(req_in_text),
+    .req_prev(req_in_text | starter),
     .req_next(req_out_text),
     .ack_prev(ack_out_cnt),
     .ack_next(ack_out_ram));
