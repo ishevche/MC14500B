@@ -60,18 +60,13 @@ module Wrapper
   
   logic starter = '0;
   logic [2:0] starter_counter = '0;
+  always_comb starter <= starter_counter == 2'b10;
   
-  always_ff @(negedge reset or posedge ack_out_text or posedge clk) begin
-    if (ack_out_text)
-      starter <= '0;
-    else begin
-      if (starter_counter <= 3)
-        starter_counter += 1'b1;
-      if (starter_counter == 2'b10)
-        starter <= '1;
-      else
-        starter <= '0;
-    end
+  always_ff @(posedge clk or posedge reset) begin
+    if (reset)
+      starter_counter <= '0;
+    else if (starter_counter <= 3)
+      starter_counter += 1'b1;
   end
   
   SB sb_ram_icu (
