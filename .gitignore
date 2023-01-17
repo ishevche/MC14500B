@@ -3,7 +3,6 @@ incremental_db
 output_files
 *.bak
 *build*
-.*
 board
-simulation
+*simulation*
 timing
