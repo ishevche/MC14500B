@@ -18,8 +18,12 @@ module RAM
   
   always_comb ack_prev <= req_prev;
   
-  always_ff @)posedge req_prev or posedge ack_next)
-    req_next <= !ack_next;
+  always_ff @(posedge req_prev or posedge ack_next) begin
+    if (ack_next)
+      req_next <= '0;
+    else
+      req_next <= '1;
+  end
   
   initial
     if (INIT_FILE != "")
