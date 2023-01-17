@@ -4,5 +4,7 @@ output_files
 *.bak
 *build*
 board
+.idea
+.qsys_edit
 *simulation*
 timing
