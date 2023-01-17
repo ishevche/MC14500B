@@ -6,7 +6,7 @@ module Wrapper_tests
     parameter OUTPUT_SIZE = 5) ();
   
 	logic clk = '0;
-	logic reset = '1;
+	logic reset = '0;
   logic [INPUT_SIZE - 1:0] input_pins = '0;
   logic [OUTPUT_SIZE - 1:0] output_pins;
  
@@ -24,6 +24,8 @@ module Wrapper_tests
 		#(50) clk = ~clk;
     
   initial begin
+    #(25) reset = '1;
+    #(50) reset = '0;
     #(1700) $display(output_pins);
   end
 endmodule
