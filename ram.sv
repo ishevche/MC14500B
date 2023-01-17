@@ -4,6 +4,7 @@ module RAM
     parameter SIZE = 2 ** ADDR_WIDTH,
     parameter INIT_FILE = "")
   ( input  logic write,
+    input  logic reset,
     input  logic [ADDR_WIDTH - 1:0] write_address,
     input  logic [ADDR_WIDTH - 1:0] read_address,
     input  logic [DATA_WIDTH - 1:0] data_in,
@@ -18,8 +19,8 @@ module RAM
   
   always_comb ack_prev <= req_prev;
   
-  always_ff @(posedge req_prev or posedge ack_next) begin
-    if (ack_next)
+  always_ff @(posedge req_prev or posedge ack_next or posedge reset) begin
+    if (ack_next || reset)
       req_next <= '0;
     else
       req_next <= '1;
@@ -28,13 +29,12 @@ module RAM
   initial
     if (INIT_FILE != "")
       $readmemh(INIT_FILE, memory);
-
-  logic [DATA_WIDTH - 1:0] out_register = '0;
-  always_latch out_register <= write ? out_register : memory[read_address];
-  
+      
   always_ff @(posedge req_prev)
-    data_out <= out_register;
-  
-  always_ff @(posedge write)
+    if (!write)
+      data_out <= memory[read_address];
+
+  always_ff @(posedge write) begin
     memory[write_address] <= data_in;
+  end
 endmodule
