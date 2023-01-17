@@ -6,5 +6,5 @@ module SB (
 	
 	always_ff @(posedge clk) begin
     out <= inp;
-    
+  end
 endmodule
