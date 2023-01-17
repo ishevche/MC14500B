@@ -15,12 +15,13 @@ module Adder
 	
 	logic r_req_l = '0;
 	
-	wire w_r_req_l = r_req_l ^ req_l;
+	logic w_r_req_l = '0;
+	always_comb w_r_req_l <= r_req_l ^ req_l;
 	
 	always_ff @(posedge w_r_req_l or posedge ack_r) begin
 		if (ack_r)
 			req_r_reg = '0;
-		else begin
+		if (w_r_req_l) begin
 			r_req_l = ~r_req_l;
 			if (r_req_l) begin
 				ack_l_reg = '1;
@@ -29,7 +30,7 @@ module Adder
 				output_pins = input_pins + 1'b1;
 				// end processing
 				
-				req_r_reg = '1;
+				req_r_reg = 1'b1 + output_pins - output_pins;
 			end else
 				ack_l_reg = '0;
 		end

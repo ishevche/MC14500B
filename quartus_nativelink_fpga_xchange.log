@@ -1,13 +1,13 @@
 Info: Read atom netlist
 Info: Directory C:/Users/Alex/Documents/Projects/MC14500B/board/fpgaxchange exists --if you continue the contents of the directory may be overwritten
 Info: Generating FPGA Xchange file C:/Users/Alex/Documents/Projects/MC14500B/board/fpgaxchange/MC14500B.fx
-Info: Atom 60 (output_pins[0]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
-Info: Atom 62 (output_pins[1]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
-Info: Atom 64 (output_pins[2]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
-Info: Atom 66 (output_pins[3]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
-Info: Atom 68 (output_pins[4]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
-Info: Atom 70 (output_pins[5]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
-Info: Atom 72 (output_pins[6]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
-Info: Atom 74 (output_pins[7]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
-Info: Atom 76 (start_btn) has key 'input,2.5 V,--,--,Off,--,0,--,0,--,--'
+Info: Atom 16 (output_pins[0]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
+Info: Atom 18 (output_pins[1]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
+Info: Atom 20 (output_pins[2]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
+Info: Atom 22 (output_pins[3]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
+Info: Atom 24 (output_pins[4]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
+Info: Atom 26 (output_pins[5]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
+Info: Atom 28 (output_pins[6]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
+Info: Atom 30 (output_pins[7]) has key 'output,2.5 V,Default,Series 50 Ohm without Calibration,--,FAST,0,--,0,--,--'
+Info: Atom 32 (start_btn) has key 'input,2.5 V,--,--,Off,--,0,--,0,--,--'
 Info: FPGA Xchange file C:/Users/Alex/Documents/Projects/MC14500B/board/fpgaxchange/MC14500B.fx generated successfully
