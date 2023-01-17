@@ -24,7 +24,7 @@ module Wrapper_tests
 		#(50) clk = ~clk;
     
   initial begin
-    #(25) reset = '1;
+    #(125) reset = '1;
     #(50) reset = '0;
     #(1700) $display(output_pins);
   end

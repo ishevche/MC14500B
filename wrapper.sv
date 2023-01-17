@@ -60,7 +60,7 @@ module Wrapper
   
   logic starter = '0;
   logic [2:0] starter_counter = '0;
-  always_comb starter <= starter_counter == 2'b10;
+  always_comb starter <= starter_counter == 1'b1;
   
   always_ff @(posedge clk or posedge reset) begin
     if (reset)

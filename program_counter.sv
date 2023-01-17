@@ -23,9 +23,9 @@ module ProgramCounter
   
   always_comb address_out <= counter;
   
-  always_ff @(posedge req_prev) begin
+  always_ff @(posedge req_prev or posedge reset) begin
     if (reset)
-      counter <= '1;
+      counter <= '0;
     else if (write)
       counter <= address_in;
     else 
