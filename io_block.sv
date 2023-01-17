@@ -25,12 +25,13 @@ module IOBlock
   
   logic ram_enable;
   logic ram_out;
+  logic ram_write = '0;
   
   always_comb ram_enable <= (address < RAM_SIZE) ? '1 : '0;
   
   RAM #(.DATA_WIDTH(1),
         .ADDR_WIDTH(RAM_WIDTH)) ram (
-    .write(write & ram_enable),
+    .write(ram_write & ram_enable),
     .reset(reset),
     .read_address(address[RAM_WIDTH-1:0]),
     .write_address(address[RAM_WIDTH-1:0]),
@@ -42,12 +43,20 @@ module IOBlock
     .ack_next(ack_next)
   );
   
+  always_ff @(posedge ack_next or posedge req_prev) begin
+    if (ack_next)
+      ram_write <= write;
+    else
+      ram_write <= '0;
+  end
+  
   logic [OUTPUT_SIZE - 1:0] output_latch = '0;
   always_comb output_pins <= output_latch;
   
-  always_ff @(posedge write) begin
-    if (RAM_SIZE <= address && address < RAM_SIZE + OUTPUT_SIZE)
-      output_latch[address - RAM_SIZE] <= data_in;
+  always_ff @(posedge ack_next) begin
+    if (write)
+      if (RAM_SIZE <= address && address < RAM_SIZE + OUTPUT_SIZE)
+        output_latch[address - RAM_SIZE] <= data_in;
    end
   
   always_comb begin
