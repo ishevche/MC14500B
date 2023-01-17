@@ -88,7 +88,6 @@ module Wrapper
     .address_out(counter));
 
   ICU icu (
-    .clk(clk),
     .data_in(data_in),
     .rst(icu_reset),
     .instruction(opcode),
