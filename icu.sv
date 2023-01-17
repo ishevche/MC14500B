@@ -23,7 +23,8 @@ module ICU (
   instruction_t instruction_register = NOPO;
   
   logic enabled;
-  always_comb enabled <= (~rst) & (~skip_register);
+  logic enabled_register = '1;
+  always_comb enabled <= (~rst) & enabled_register;
  
   always_comb flag_o  <= enabled & instruction_register == NOPO;
   always_comb flag_f  <= enabled & instruction_register == NOPF;
@@ -33,32 +34,25 @@ module ICU (
   always_comb rr_out   <= result_register;
   always_comb data_out <= out_register;
   
-  logic write_register = '0;
-  
   always_comb write <= enabled &
                        oen_register &
-                       write_register &
+                       ~clk &
                        (instruction_register == STO | instruction_register == STOC);
-  logic r_clk = '0;
-  wire logic w_xor_clk = r_clk ^ clk;
   
-  always @(posedge w_xor_clk) begin
-    r_clk = ~r_clk;
-    if (r_clk)
-      write_register <= '0;
-    else
-      write_register <= 1'b1;
-  end
-
+  logic old_skip_register = '0;
   
   always_ff @(negedge clk) begin
     if (!rst) begin
       instruction_register <= instruction;
       
+      old_skip_register = skip_register;
+      
       if (skip_register)
         skip_register = '0;
       else
         skip_register = instruction == RTN | (instruction == SKZ & ~result_register);
+      
+      enabled_register = ~(old_skip_register | skip_register);
       
       if (enabled & oen_register) begin
         if (instruction == STO)
