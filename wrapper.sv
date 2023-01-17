@@ -132,7 +132,6 @@ module Wrapper
   );
                              
   ProgramCounter #(.ADDR_WIDTH(ADDR_WIDTH)) cnt (
-    .clk(clk),
     .reset(pc_reset),
     .write(jmp_flag),
     .address_in(address),
@@ -143,7 +142,6 @@ module Wrapper
     .ack_next(ack_out_text));
 
   ICU icu (
-    .clk(clk),
     .data_in(data_in),
     .rst(icu_reset),
     .instruction(opcode),
