@@ -6,8 +6,8 @@ module Programator
     input 							uart_serial_rx,
 	 output [ADDR_WIDTH - 1:0] address,
 	 output 							write,
-	 output [11:0]					result, 
-	 output							reset);
+	 output [11:0]				result, 
+	 output							  reset);
 	   
   localparam state_wait_first     = 3'b000;
   localparam state_wait_second    = 3'b001;
