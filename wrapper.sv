@@ -17,6 +17,7 @@ module Wrapper
   logic data_in = '0;
   
   wire logic [ADDR_WIDTH - 1:0] counter;
+  wire logic [ADDR_WIDTH - 1:0] uart_address;
   wire logic [DATA_WIDTH - 1:0] cmd;
   wire logic jmp_flag;
   wire logic rtn_flag;
@@ -48,6 +49,45 @@ module Wrapper
   logic pc_reset;
   logic icu_reset;
   
+  logic req_out_icu;
+  logic req_out_cnt;
+  logic req_out_text;
+  logic req_out_ram;
+  
+  logic req_in_icu;
+  logic req_in_cnt;
+  logic req_in_text;
+  logic req_in_ram;
+  
+  logic ack_out_icu;
+  logic ack_out_cnt;
+  logic ack_out_text;
+  logic ack_out_ram;
+  
+  SB sb_ram_icu (
+  .clk(clk),
+  .inp(req_out_ram),
+  .out(req_in_icu)
+  );
+  
+  SB sb_icu_cnt(
+  .clk(clk),
+  .inp(req_out_icu),
+  .out(req_in_cnt)
+  );
+  
+  SB sb_cnt_text(
+  .clk(clk),
+  .inp(req_out_cnt),
+  .out(req_in_text)
+  );
+  
+  SB sb_text_ram(
+  .clk(clk),
+  .inp(req_out_text),
+  .out(req_in_ram)
+  );
+  
   ResetModule reset_module (
     .clk(clk),
     .reset(~reset),
@@ -57,17 +97,28 @@ module Wrapper
   RAM #(.DATA_WIDTH(1),
         .ADDR_WIDTH(ADDR_WIDTH)) ram (
     .write(data_write_register & (address > INPUT_SIZE + OUTPUT_SIZE)),
-    .address(address_register),
+    .read_address(address_register),
+	 .write_address(address_register),
     .data_in(data_out),
-    .data_out(data_from_ram));
+    .data_out(data_from_ram),
+    .req_prev(req_in_ram),
+    .req_next(req_out_ram), 
+    .ack_prev(ack_out_text),
+    .ack_next(ack_out_icu));
+    
   
   RAM #(.DATA_WIDTH(DATA_WIDTH),
         .ADDR_WIDTH(ADDR_WIDTH),
         .INIT_FILE("program.mem")) text (
     .write(program_write),
-    .address(counter),
+    .read_address(counter),
+	 .write_address(uart_address),
     .data_in(program_cmd),
-    .data_out(cmd));
+    .data_out(cmd),
+    .req_prev(req_in_text),
+    .req_next(req_out_text),
+    .ack_prev(ack_out_cnt),
+    .ack_next(ack_out_ram));
   
   IOBlock #(.ADDR_WIDTH(ADDR_WIDTH),
             .INPUT_SIZE(INPUT_SIZE),
@@ -81,11 +132,14 @@ module Wrapper
   );
                              
   ProgramCounter #(.ADDR_WIDTH(ADDR_WIDTH)) cnt (
-    .clk(clk),
     .reset(pc_reset),
     .write(jmp_flag),
     .address_in(address),
-    .address_out(counter));
+    .address_out(counter), 
+    .req_prev(req_in_cnt),
+    .req_next(req_out_cnt),
+    .ack_prev(ack_out_icu),
+    .ack_next(ack_out_text));
 
   ICU icu (
     .data_in(data_in),
@@ -97,6 +151,10 @@ module Wrapper
     .rtn(rtn_flag),
     .flag_o(flag_o),
     .flag_f(flag_f),
-    .rr_out(rr_out));
+    .rr_out(rr_out),
+    .req_prev(req_in_icu),
+    .req_next(req_out_icu),
+    .ack_prev(ack_out_ram),
+    .ack_next(ack_out_cnt));
 
 endmodule
