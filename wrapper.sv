@@ -25,7 +25,6 @@ module Wrapper
   wire logic flag_f;
   wire logic data_out;
   wire logic data_write;
-  wire logic io_write;
   wire logic rr_out;
   wire logic data_from_io;
   
@@ -39,9 +38,6 @@ module Wrapper
   
   always_comb
     address_register <= address;
-  
-  logic pc_reset;
-  logic icu_reset;
   
   logic req_out_icu;
   logic req_out_cnt;
@@ -57,6 +53,7 @@ module Wrapper
   logic ack_out_cnt;
   logic ack_out_text;
   logic ack_out_ram;
+  logic ack_in_icu;
   
   logic starter = '0;
   logic [2:0] starter_counter = '0;
@@ -100,8 +97,8 @@ module Wrapper
   SB sb_write(
     .clk(clk),
     .reset(reset),
-    .inp(data_write),
-    .out(io_write)
+    .inp(ack_in_icu),
+    .out(ack_out_ram)
   );
   
   RAM #(.DATA_WIDTH(DATA_WIDTH),
@@ -121,7 +118,7 @@ module Wrapper
   IOBlock #(.ADDR_WIDTH(ADDR_WIDTH),
             .INPUT_SIZE(INPUT_SIZE),
             .OUTPUT_SIZE(OUTPUT_SIZE)) io (
-    .write(io_write),
+    .write(data_write),
     .reset(reset),
     .data_in(data_out),
     .data_out(data_from_io),
@@ -157,7 +154,7 @@ module Wrapper
     .rr_out(rr_out),
     .req_prev(req_in_icu),
     .req_next(req_out_icu),
-    .ack_prev(ack_out_ram),
+    .ack_prev(ack_in_icu),
     .ack_next(ack_out_icu));
 
 endmodule

@@ -63,7 +63,7 @@ module ICU (
       enabled <= '0;
     end else if (req_prev) begin
       old_skip_register <= skip_register;
-      if (enabled) begin
+      if (!skip_register) begin
         instruction_register <= instruction;
         case (instruction)
           AND:  result_register <= result_register &  data_in_masked;
