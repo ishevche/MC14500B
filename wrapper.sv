@@ -5,8 +5,8 @@ module Wrapper
     parameter INSTRUCTION_WIDTH = 4,
     parameter DATA_WIDTH = ADDR_WIDTH + INSTRUCTION_WIDTH,
     parameter STACK_ADDR_WIDTH = 4,
-    parameter INPUT_SIZE = 5,
-    parameter OUTPUT_SIZE = 5)
+    parameter INPUT_SIZE = 8,
+    parameter OUTPUT_SIZE = 8)
   ( input  logic clk,
     input  logic reset,
     input  logic program_write,
@@ -62,6 +62,23 @@ module Wrapper
   logic [2:0] starter_counter = '0;
   always_comb starter <= starter_counter == 1'b1;
   
+  logic trace = '0;
+  always_comb trace <= trace | jmp_flag;
+  logic [28:0] cntr1 = '0;
+  logic [28:0] cntr2 = '0;
+  logic [28:0] cntr3 = '0;
+  logic [28:0] cntr4 = '0;
+  always_comb output_pins[7:0] <= cntr1;//[28:21];
+  //always_ff @(posedge req_in_text)
+  //  cntr1 += 1'b1;
+  //always_ff @(posedge req_in_ram)
+  //  cntr2 += 1'b1;//ack_out_ram;
+  //always_ff @(posedge req_in_cnt)
+  //  cntr3 += 1'b1;
+  always_ff @(posedge req_in_icu)
+    if (opcode == ORC)
+      cntr1 <= '1;
+  
   always_ff @(posedge clk or posedge reset) begin
     if (reset)
       starter_counter <= '0;
@@ -107,7 +124,7 @@ module Wrapper
   RAM #(.DATA_WIDTH(DATA_WIDTH),
         .ADDR_WIDTH(ADDR_WIDTH),
         .INIT_FILE("program.mem")) text (
-    .write(program_write),
+    .write('0), // program_write
     .reset(reset),
     .read_address(counter),
 	  .write_address(uart_address),
@@ -127,7 +144,7 @@ module Wrapper
     .data_out(data_from_io),
     .address(address_register),
     .input_pins(input_pins),
-    .output_pins(output_pins),
+    .output_pins(output_pins2), // 2
     .req_prev(req_in_ram),
     .req_next(req_out_ram), 
     .ack_prev(ack_out_text),

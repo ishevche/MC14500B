@@ -19,7 +19,7 @@ module ICU (
   
   always_comb ack_prev <= req_prev;
   logic req_next_buf = '0;
-  always_comb req_next <= req_next_buf;
+  always_comb req_next <= ~rst & req_next_buf;
   always_ff @(posedge req_prev or posedge ack_next) begin
     if (ack_next)
       req_next_buf <= '0;

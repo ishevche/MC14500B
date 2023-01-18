@@ -15,7 +15,7 @@ module Programator
   localparam state_write_up       = 3'b011;
   localparam state_counter_up     = 3'b100;
   localparam state_stop_recieved  = 3'b110;
-  localparam state_reset_up 		 = 3'b101;
+  localparam state_reset_up 		  = 3'b101;
 	 
   logic [7:0] 					uart_data;
   logic [11:0]					output_data;

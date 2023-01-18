@@ -31,8 +31,7 @@ module RAM
       $readmemh(INIT_FILE, memory);
       
   always_ff @(posedge req_prev)
-    if (!write)
-      data_out <= memory[read_address];
+    data_out <= memory[read_address];
 
   always_ff @(posedge write) begin
     memory[write_address] <= data_in;

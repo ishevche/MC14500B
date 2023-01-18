@@ -5,7 +5,7 @@ module SB (
 	output logic out
 );
 	logic out_reg = '0;
-  always_comb out <= out_reg;
+  always_comb out <= out_reg & inp;
   
 	always_ff @(posedge clk)
     out_reg <= inp & ~reset;
