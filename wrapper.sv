@@ -62,23 +62,6 @@ module Wrapper
   logic [2:0] starter_counter = '0;
   always_comb starter <= starter_counter == 1'b1;
   
-  logic trace = '0;
-  always_comb trace <= trace | jmp_flag;
-  logic [28:0] cntr1 = '0;
-  logic [28:0] cntr2 = '0;
-  logic [28:0] cntr3 = '0;
-  logic [28:0] cntr4 = '0;
-  always_comb output_pins[7:0] <= cntr1;//[28:21];
-  //always_ff @(posedge req_in_text)
-  //  cntr1 += 1'b1;
-  //always_ff @(posedge req_in_ram)
-  //  cntr2 += 1'b1;//ack_out_ram;
-  //always_ff @(posedge req_in_cnt)
-  //  cntr3 += 1'b1;
-  always_ff @(posedge req_in_icu)
-    if (opcode == ORC)
-      cntr1 <= '1;
-  
   always_ff @(posedge clk or posedge reset) begin
     if (reset)
       starter_counter <= '0;
@@ -144,7 +127,7 @@ module Wrapper
     .data_out(data_from_io),
     .address(address_register),
     .input_pins(input_pins),
-    .output_pins(output_pins2), // 2
+    .output_pins(output_pins), // 2
     .req_prev(req_in_ram),
     .req_next(req_out_ram), 
     .ack_prev(ack_out_text),

@@ -30,7 +30,6 @@ module ICU (
   logic result_register = '0;
   logic ien_register    = '0;
   logic oen_register    = '0;
-  logic old_skip_register = '0;
   logic skip_register   = '0;
   logic out_register    = '0;
   

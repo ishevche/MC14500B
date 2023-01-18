@@ -24,7 +24,7 @@ module RAM
       req_next <= '0;
     else
       req_next <= '1;
-  end
+  end 
   
   initial
     if (INIT_FILE != "")
