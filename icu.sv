@@ -62,8 +62,10 @@ module ICU (
       skip_register <= '0;
       enabled <= '0;
     end else if (req_prev) begin
-      old_skip_register <= skip_register;
-      if (!skip_register) begin
+      enabled <= ~skip_register;
+      if (skip_register)
+        skip_register = '0;
+      else begin
         instruction_register <= instruction;
         case (instruction)
           AND:  result_register <= result_register &  data_in_masked;
@@ -75,20 +77,11 @@ module ICU (
           LDC:  result_register <= ~data_in_masked;
           IEN:  ien_register    <= data_in;
           OEN:  oen_register    <= data_in_masked;
-          RTN:  skip_register   <= '1;
-          SKZ:  skip_register   <= ~result_register;
+          RTN:  skip_register   = '1;
+          SKZ:  skip_register   = ~result_register;
           STO:  out_register    <= result_register;
           STOC: out_register    <= ~result_register;
         endcase
-      end else if (skip_register)
-        skip_register <= '0;
-      
-      enabled = ~skip_register & ~old_skip_register;
-      if (!enabled) begin
-        instruction_register <= NOPO;
-        result_register <= '0;
-        ien_register <= '0;
-        oen_register <= '0;
       end
     end
   end

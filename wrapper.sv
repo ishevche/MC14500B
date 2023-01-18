@@ -4,6 +4,7 @@ module Wrapper
   #(parameter ADDR_WIDTH = 8,
     parameter INSTRUCTION_WIDTH = 4,
     parameter DATA_WIDTH = ADDR_WIDTH + INSTRUCTION_WIDTH,
+    parameter STACK_ADDR_WIDTH = 4,
     parameter INPUT_SIZE = 5,
     parameter OUTPUT_SIZE = 5)
   ( input  logic clk,
@@ -32,12 +33,14 @@ module Wrapper
   always_comb opcode <= instruction_t'(cmd[DATA_WIDTH - 1:ADDR_WIDTH]);
   always_comb address <= cmd[ADDR_WIDTH - 1:0];
   logic [ADDR_WIDTH - 1:0] address_register = '0;
+  logic [1:0] pc_instruction = '0;
   
-  always_comb
-    data_in <= address == '1 ? rr_out : data_from_io;
+  always_comb pc_instruction[0] <= jmp_flag | flag_f;
+  always_comb pc_instruction[1] <= rtn_flag | flag_f;
   
-  always_comb
-    address_register <= address;
+  always_comb data_in <= address == '1 ? rr_out : data_from_io;
+  
+  always_comb address_register <= address;
   
   logic req_out_icu;
   logic req_out_cnt;
@@ -131,9 +134,11 @@ module Wrapper
     .ack_next(ack_out_ram)
   );
                              
-  ProgramCounter #(.ADDR_WIDTH(ADDR_WIDTH)) cnt (
+  ProgramCounter #(.ADDR_WIDTH(ADDR_WIDTH),
+                   .STACK_ADDR_WIDTH(STACK_ADDR_WIDTH)) cnt (
     .reset(reset),
     .write(jmp_flag),
+    .instruction(pc_instruction),
     .address_in(address),
     .address_out(counter), 
     .req_prev(req_in_cnt),
